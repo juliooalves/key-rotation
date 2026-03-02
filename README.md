@@ -1,3 +1,3 @@
-# Vault-key-pairs-rotation
+# Vault-key-rotation
 
-This is a project  explores and utilises the powers of key-rotation security methods using the **HashiCorp Vault Server**
+This is a project that explores and utilises the powers of key-rotation security methods using the **HashiCorp Vault Server** as secrets manager

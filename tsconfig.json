@@ -4,11 +4,11 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
-
+    "moduleResolution": "node16",
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "es2020",
-    "target": "CommonJS",
+    "module": "es2022",
+    "target": "es2022",
     "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -41,5 +41,9 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
+  "paths": {
+    "@/*": ["./*"]
+  },
+
   "include": ["src/**/*"]
 }

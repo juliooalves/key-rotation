@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import vault from "node-vault";
+import crypto from "crypto";
 import vaultClient from "../vault.ts";
 
 export default async function getUserToken(userData: {
@@ -7,13 +8,26 @@ export default async function getUserToken(userData: {
   email: string;
 }): Promise<string> {
   try {
+    const authMethods = await vaultClient().read("sys/auth");
+    console.log(authMethods);
+    const tokenAccessor = authMethods.data["token/"].accessor;
+    console.log("token accessor");
     await vaultClient().write(`identity/entity/name/${userData.id}`, {
       metadata: {
         email: userData.email,
-        session_id: "1234",
+        session_id: crypto.randomBytes(20).toString("hex"),
       },
     });
-    console.log("passed on the write identity endpoint");
+
+    const entityId = await vaultClient().read(
+      `identity/entity/name/${userData.id}`,
+    );
+    const canonicalId = entityId.data.id;
+    await vaultClient().write(`identity/entity-alias`, {
+      name: userData.id, // The 'name' of the user in the auth method
+      canonical_id: canonicalId, // The ID of the entity we just created
+      mount_accessor: tokenAccessor,
+    });
     const tokenRequest = await vaultClient().write(
       "auth/token/create/jwt-issuer",
       {

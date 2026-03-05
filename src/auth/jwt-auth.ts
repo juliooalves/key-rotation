@@ -1,57 +1,21 @@
-import jwt from "jsonwebtoken";
-import vault from "node-vault";
-import crypto from "crypto";
-import vaultClient from "../vault.ts";
+import * as jose from "jose";
 
-export default async function getUserToken(userData: {
-  id: string;
-  email: string;
-}): Promise<string> {
+const JWKS_URL = "http://localhost:8200/v1/identity/oidc/.well-known/keys";
+
+export default async function userTokenAuth(jwt: string): Promise<string> {
   try {
-    const authMethods = await vaultClient().read("sys/auth");
-    console.log(authMethods);
-    const tokenAccessor = authMethods.data["token/"].accessor;
-    console.log("token accessor");
-    await vaultClient().write(`identity/entity/name/${userData.id}`, {
-      metadata: {
-        email: userData.email,
-        session_id: crypto.randomBytes(20).toString("hex"),
-      },
+    const JWKS = jose.createRemoteJWKSet(new URL(JWKS_URL));
+    const claims = jose.decodeJwt(jwt);
+    const { payload, protectedHeader } = await jose.jwtVerify(jwt, JWKS, {
+      issuer: claims.iss,
+      audience: claims.aud,
     });
-
-    const entityId = await vaultClient().read(
-      `identity/entity/name/${userData.id}`,
-    );
-    const canonicalId = entityId.data.id;
-    await vaultClient().write(`identity/entity-alias`, {
-      name: userData.id, // The 'name' of the user in the auth method
-      canonical_id: canonicalId, // The ID of the entity we just created
-      mount_accessor: tokenAccessor,
-    });
-    const tokenRequest = await vaultClient().write(
-      "auth/token/create/jwt-issuer",
-      {
-        entity_alias: userData.id,
-        ttl: "5m",
-      },
-    );
-    console.log("token request successfully created", tokenRequest);
-    const vaultUserToken = await tokenRequest.auth.client_token;
-    const vaultUserClient = vault({
-      endpoint: "http://localhost:8200",
-      token: vaultUserToken,
-    });
-
-    console.log("user vault client created.");
-    const result = await vaultUserClient.read("identity/oidc/token/user-role");
-    console.log("result", result);
-    console.log("passed on user token getter", result.data.token);
-    return result.data.token;
+    console.log("Token validated successfully", payload);
+    return payload;
   } catch (err) {
-    console.error(
-      "Error: Server failed to load user token on vault,  error:",
-      err,
-    );
-    return;
+    console.log(typeof err);
+    console.log(err);
+    console.error("Error when tried to Validate user Token:", err.message);
+    return err;
   }
 }

@@ -1,4 +1,4 @@
-import vaultClient from "../src/vault.ts";
+import { vaultClient } from "../src/vault.ts";
 
 const dataSigner = async (payload: object): Promise<string> => {
   const base64Data = Buffer.from(JSON.stringify(payload)).toString("base64");

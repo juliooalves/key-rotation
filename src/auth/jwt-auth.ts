@@ -1,6 +1,6 @@
 import * as jose from "jose";
 
-const JWKS_URL = "http://localhost:8200/v1/identity/oidc/.well-known/keys";
+const JWKS_URL = "http://vault:8200/v1/identity/oidc/.well-known/keys";
 
 export default async function userTokenAuth(jwt: string): Promise<string> {
   try {

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import vault from "node-vault";
 import crypto from "crypto";
-import vaultClient from "../vault.ts";
+import { vaultClient } from "../vault.ts";
 
 export default async function userTokenGenerator(userData: {
   id: string;
@@ -10,6 +10,7 @@ export default async function userTokenGenerator(userData: {
   try {
     const authMethods = await vaultClient().read("sys/auth");
     console.log(authMethods);
+    console.log("teste");
     const tokenAccessor = authMethods.data["token/"].accessor;
     console.log("token accessor");
     await vaultClient().write(`identity/entity/name/${userData.id}`, {
@@ -36,9 +37,9 @@ export default async function userTokenGenerator(userData: {
       },
     );
     console.log("token request successfully created", tokenRequest);
-    const vaultUserToken = await tokenRequest.auth.client_token;
+    const vaultUserToken = tokenRequest.auth.client_token;
     const vaultUserClient = vault({
-      endpoint: "http://localhost:8200",
+      endpoint: "http://vault:8200",
       token: vaultUserToken,
     });
 

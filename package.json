@@ -9,8 +9,8 @@
   ],
   "type": "module",
   "scripts": {
-    "start": "node src/server.ts",
-    "dev": "nodemon src/server.ts",
+    "start": "node --import=tsx --watch src/server.ts",
+    "dev": "nodemon --watch src --ext ts,tsx,json --exec \"tsx src/server.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

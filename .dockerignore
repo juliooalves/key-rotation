@@ -1,0 +1,28 @@
+# Ignore common version control and environment files
+.git
+.gitignore
+.env
+.vscode
+
+# Ignore build artifacts and dependencies
+node_modules
+build
+dist
+**/coverage
+venv
+
+# Ignore temporary and log files
+*.log
+npm-debug.log
+**/temp*
+*~
+
+# Ignore common OS-specific files
+.DS_Store
+Thumbs.db
+
+# The Dockerfile itself can be ignored, as it is used by the client to build the image
+# Dockerfile 
+
+# You can also use "!" to re-include a specific file or directory that would otherwise be ignored
+# !/src/important_config.json

@@ -5,6 +5,32 @@ services:
       - "8200:8200"
     environment:
       - VAULT_DEV_MODE=1
+      - VAULT_DEV_ROOT_TOKEN_ID="root"
       - VAULT_ADDR=http://0.0.0.0:8200
     cap_add:
       - IPC_LOCK
+
+  vault-init:
+    image: hashicorp/vault:latest
+    depends_on:
+      - vault
+    volumes:
+      - ./scripts:/scripts
+      - ./vault/policies:/vault/policies
+      - ./config:/shared_config
+    entrypoint: ["/bin/sh", "/scripts/init-vault.sh"]
+    environment:
+      - VAULT_ADDR= "http://vault:8200"
+      - VAULT_TOKEN= "root"
+  backend:
+    ports:
+      - "3000:3000"
+    build: .
+    volumes:
+      - .:/server
+      - ./config:/server/config
+    environment:
+      - ENV_FILE=/server/config/.env.vault
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully

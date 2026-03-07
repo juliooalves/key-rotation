@@ -2,38 +2,26 @@ import express, {
   type Application,
   type Request,
   type Response,
+  type Next,
 } from "express";
 import * as dotenv from "dotenv";
-import dataSigner from "./data-signer.ts";
-import routerJwt from "./routes/jwt-route.ts";
-import JWTMiddleware from "./middleware/session-middleware.ts";
-import { initVaultClient } from "./vault.ts";
-dotenv.config();
+import jwtRouter from "./routes/jwt-route.ts";
+import userRouter from "./routes/user-route.ts";
+import callBackRouter from "./routes/callback-route.ts";
+import vaultRouter from "./routes/vault-route.ts";
+import { initVaultClient } from "./utils/vault.ts";
 const app: Application = express();
 const port = 3000;
-
-const payload = {
-  id: "783rht",
-  email: "lester123@gmail.com",
-};
+dotenv.config();
 
 app.use(express.json());
-app.post("/user-auth", JWTMiddleware, async (req: Request, res: Response) => {
-  try {
-    res.status(200).json({ signature: "teste" });
-  } catch (err) {
-    console.error("Error: Internal server error:", err);
-    res
-      .status(500)
-      .send("Something went wrong with the request. Please try again later");
-  }
-});
-
-app.use("/api/users", routerJwt);
+app.use("/api/auth", jwtRouter);
+app.use("/home", userRouter);
+app.use("/api/vault", vaultRouter);
+app.use(callBackRouter);
 
 initVaultClient().then(() => {
   app.listen(port, () => {
-    console.log("Server is up on port", port);
-    console.log(process.env.VAULT_TOKEN);
+    console.log("Server is up on port: ", port);
   });
 });

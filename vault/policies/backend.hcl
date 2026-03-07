@@ -3,6 +3,9 @@
 path "identity/oidc/token/*" {
    capabilities = ["read", "create", "update"]
  }
+path "identity/oidc/key/jwt-key/rotate" {
+  capabilities= ["update"]
+}
 path "sys/auth/*" {
   capabilities= ["read", "create", "update"]
  }

@@ -1,11 +1,12 @@
 import jwt from "jsonwebtoken";
 import vault from "node-vault";
 import crypto from "crypto";
-import { vaultClient } from "../vault.ts";
+import { vaultClient } from "../utils/vault.ts";
 
 export default async function userTokenGenerator(userData: {
   id: string;
   email: string;
+  password?: string;
 }): Promise<string> {
   try {
     const authMethods = await vaultClient().read("sys/auth");

@@ -4,16 +4,16 @@ This project implements a secure, automated Identity Provider (IdP) architecture
 
 ### Core Features
 
-**1. Infrastructure as Code (IaC)**
+**1. Infrastructure as Code (IaC)**:
    The environment is bootstrapped via an automated initialization script that configures Vault's engine, sets up AppRole authentication for the backend, and initializes the OIDC provider. This ensures a consistent, reproducible security environment.
 
-**2. Service-Level Authentication (AppRole)**
+**2. Service-Level Authentication (AppRole)**:
    The backend service utilizes the AppRole method to authenticate with Vault. This eliminates the need for hardcoded root tokens in the codebase. The service exchanges a RoleID and SecretID for a temporary, limited-privilege client token.
 
-**3. Dynamic OIDC Lifecycle**
+**3. Dynamic OIDC Lifecycle**:
    The system acts as a full OIDC issuer. It manages the generation of JWTs, including identity claims and metadata mapping. The backend validates these tokens by dynamically fetching public keys from the Vault JWKS endpoint.
 
-**4. Cryptographic Key Rotation**
+**4. Cryptographic Key Rotation**:
    A dedicated endpoint allows for the rotation of the OIDC signing keys. The system demonstrates "zero-downtime" rotation, where the backend seamlessly transitions to the new public key without manual configuration updates.
 
 ### Getting Started

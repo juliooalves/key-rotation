@@ -1,6 +1,7 @@
 HOME_URL=http://localhost:3000/home
 LOGIN_URL=http://localhost:3000/api/auth/jwt-generator
 ROTATION_URL=http://localhost:3000/api/vault/key-rotation
+JWKS_URL=http://localhost:3000/api/vault/jwks
 SESSION_FILE=.jwt_token
 
 BLUE=\033[0;34m
@@ -49,12 +50,22 @@ token: check_session
 	@echo -e "$(BLUE)--- JWT Payload Analysis ---$(NC)"
 	@TOKEN=$$(cat $(SESSION_FILE)); \
 	docker compose exec -T backend jwt decode $$TOKEN
+
 rotate-keys:
 	@echo -e "$(YELLOW)Triggering Key Rotation...$(NC)"
 	@RESPONSE=$$(curl -s -X POST $(ROTATION_URL)); \
 	echo -e "$(GREEN)Rotation signal sent.$(NC)"; \
 	echo $$RESPONSE | docker compose exec -T backend jq .
 
+get-keys:
+	@echo -e "$(BLUE)--- JWKS Public Keys ---$(NC)"
+	@echo -e "$(YELLOW)Making connection with the server...$(NC)"
+	@RESPONSE=$$(curl -s -X GET $(JWKS_URL)); \
+	echo -e "$(GREEN)Connection sucessfull, retrieving data.$(NC)"; \
+	echo $$RESPONSE  | docker compose exec -T backend jq .
+
 logout:
 	@rm -f $(SESSION_FILE)
 	@echo -e "$(YELLOW)Session cleared.$(NC)"
+
+

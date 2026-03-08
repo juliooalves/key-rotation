@@ -6,7 +6,6 @@ import { vaultClient } from "../utils/vault.ts";
 export default async function userTokenGenerator(userData: {
   id: string;
   email: string;
-  password?: string;
 }): Promise<string> {
   try {
     const authMethods = await vaultClient().read("sys/auth");
